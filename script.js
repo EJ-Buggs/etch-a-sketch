@@ -1,32 +1,59 @@
 const grid = document.querySelector(".grid");
-let size = 256;
+const border = document.querySelector(".border");
+const colorPicker = document.querySelector("#colorPicker");
+const eraser = document.querySelector(".eraser");
+const clear = document.querySelector(".clear");
+const lines = document.querySelector(".lines");
+const inputBox = document.querySelector("#inputBox");
+const size = document.querySelector("#size");
+let value = 32;
 let isDragging = false;
+let color = "black";
 
-for (let i = 0; i < size; i++) {
-  const square = document.createElement("div");
-  square.style.width = "100%";
-  square.style.height = "100%";
-  square.style.backgroundColor = "white";
+const setGrid = function () {
+  grid.innerHTML = "";
 
-  document.addEventListener("mousedown", function () {
-    isDragging = true;
-  });
+  for (let i = 0; i < value * value; i++) {
+    const square = document.createElement("div");
+    square.classList.add("square");
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = `repeat(${value}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${value}, 1fr)`;
 
-  square.addEventListener("mousemove", function () {
-    isDragging ? (square.style.backgroundColor = "black") : null;
-  });
+    square.addEventListener("mousedown", () => (isDragging = true));
+    square.addEventListener("mousemove", () =>
+      isDragging ? (square.style.backgroundColor = color) : null
+    );
+    square.addEventListener(
+      "click",
+      () => (square.style.backgroundColor = color)
+    );
+    document.addEventListener("mouseup", () => (isDragging = false));
 
-  square.addEventListener("click", function () {
-    square.style.backgroundColor = "black";
-  });
+    grid.appendChild(square);
+  }
+};
+setGrid();
 
-  document.addEventListener("mouseup", function () {
-    isDragging = false;
-  });
+lines.addEventListener("click", function () {
+  const squares = document.querySelectorAll(".square");
+  squares.forEach((square) => square.classList.toggle("border"));
+});
 
-  grid.appendChild(square);
-}
+eraser.addEventListener("click", () => (color = "white"));
+colorPicker.addEventListener("input", function () {
+  const newColor = colorPicker.value;
+  color = newColor;
+});
+clear.addEventListener("click", setGrid);
 
-grid.style.display = "grid";
-grid.style.gridTemplateColumns = "repeat(16, 1fr)";
-grid.style.gridTemplateRows = "repeat(16, 1fr)";
+size.addEventListener("click", function () {
+  if (inputBox.value > 100) {
+    value = 100;
+  } else if (inputBox.value < 1) {
+    inputBox.value = 1;
+  } else {
+    value = inputBox.value;
+  }
+  setGrid();
+});
